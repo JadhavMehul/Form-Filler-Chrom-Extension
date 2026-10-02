@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Form Filler test page</title>
+<style>body{font:14px system-ui;max-width:480px;margin:40px auto}div{margin:10px 0}label{display:block}</style></head>
+<body>
+<h2>Test form (use "Form 1 data")</h2>
+<form>
+  <div><label for="n">Full Name *</label><input id="n"></div>
+  <div><label>Email: <input type="email"></label></div>
+  <div><span>Phone</span><input type="tel"></div>
+  <div><label for="d">Date of Birth</label><input id="d" type="date"></div>
+  <fieldset><legend>Gender</legend>
+    <label><input type="radio" name="g" value="m"> Male</label>
+    <label><input type="radio" name="g" value="f"> Female</label>
+  </fieldset>
+  <div><input placeholder="City"></div>
+  <div><label for="c">Country</label><select id="c"><option value="">Select</option><option value="in">India</option><option value="us">USA</option></select></div>
+  <div><label for="a">Address</label><textarea id="a"></textarea></div>
+  <div><label><input type="checkbox"> I agree to the terms</label></div>
+</form>
+</body></html>

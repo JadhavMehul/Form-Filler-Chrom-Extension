@@ -1,0 +1,44 @@
+:root {
+  --paper: #ffffff;
+  --ink: #1f2a37;
+  --muted: #6b7686;
+  --line: #d7dde5;
+  --focus: #3b6fe0;
+  --ok: #1e7a4c;
+  --warn: #a2560f;
+}
+* { box-sizing: border-box; }
+body {
+  width: 300px;
+  margin: 0;
+  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+header { padding: 14px 16px 8px; }
+h1 { margin: 0; font-size: 15px; font-weight: 650; }
+header p { margin: 2px 0 0; color: var(--muted); }
+
+main { padding: 6px 16px 12px; display: grid; gap: 8px; }
+
+/* Each button is drawn like a text field, since that's what it fills */
+.fill {
+  display: flex; align-items: baseline; justify-content: space-between;
+  width: 100%; padding: 9px 11px;
+  font: inherit; color: var(--ink); text-align: left;
+  background: var(--paper);
+  border: 1px solid var(--line); border-radius: 4px;
+  cursor: pointer;
+}
+.fill:hover { border-color: #aeb8c6; }
+.fill:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(59,111,224,.2); }
+.fill:active { background: #f5f7fa; }
+.fill .count { color: var(--muted); font-size: 12px; }
+.fill[aria-busy="true"] { opacity: .6; cursor: progress; }
+
+footer { padding: 0 16px 14px; min-height: 0; }
+footer:empty { display: none; }
+.msg { padding: 9px 11px; border-left: 3px solid var(--ok); background: #f1f8f4; }
+.msg.warn { border-color: var(--warn); background: #fdf6ee; }
+.msg strong { display: block; font-weight: 600; }
+.msg ul { margin: 4px 0 0; padding-left: 16px; color: var(--muted); }
