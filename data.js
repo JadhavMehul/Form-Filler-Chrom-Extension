@@ -23,8 +23,11 @@
  *   - Several checkboxes under one question:
  *                    ["Option A", "Option C"]
  *
- *  After editing, open chrome://extensions and click the
- *  reload icon on Form Filler.
+ *  NOTE: This file only provides the STARTING data the first
+ *  time the extension runs. After that, edit your forms inside
+ *  the extension (click Edit next to a form).
+ *
+
  * ============================================================
  */
 

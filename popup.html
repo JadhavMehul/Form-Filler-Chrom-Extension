@@ -5,12 +5,41 @@
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-  <header>
-    <h1>Form Filler</h1>
-    <p>Open your form, then pick the data to fill.</p>
-  </header>
-  <main id="list"></main>
-  <footer id="status" role="status" aria-live="polite"></footer>
+  <!-- List view: fill buttons -->
+  <section id="listView">
+    <header>
+      <h1>Form Filler</h1>
+      <p>Open your form, then pick the data to fill.</p>
+    </header>
+    <main id="list"></main>
+    <div class="bar">
+      <button id="addForm" class="link" type="button">+ Add form</button>
+    </div>
+    <footer id="status" role="status" aria-live="polite"></footer>
+  </section>
+
+  <!-- Edit view -->
+  <section id="editView" hidden>
+    <header class="edit-head">
+      <button id="back" class="link" type="button">‹ Done</button>
+      <span id="saved" class="saved" aria-live="polite"></span>
+    </header>
+    <div class="edit-body">
+      <label class="lbl" for="formName">Button name</label>
+      <input id="formName" class="txt" type="text" />
+
+      <div class="fields-head">
+        <span>Label on the page</span>
+        <span>Value</span>
+      </div>
+      <div id="fields"></div>
+      <button id="addField" class="link" type="button">+ Add field</button>
+
+      <p class="hint">Changes save automatically. For dropdowns and radio buttons, type the option's text. For several checkboxes under one question, choose "Multiple" and separate options with commas.</p>
+
+      <button id="deleteForm" class="danger" type="button">Delete this form</button>
+    </div>
+  </section>
 
   <script src="data.js"></script>
   <script src="filler.js"></script>

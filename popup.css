@@ -3,13 +3,16 @@
   --ink: #1f2a37;
   --muted: #6b7686;
   --line: #d7dde5;
+  --soft: #f5f7fa;
   --focus: #3b6fe0;
   --ok: #1e7a4c;
   --warn: #a2560f;
+  --danger: #b42318;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
-  width: 300px;
+  width: 340px;
   margin: 0;
   font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--ink);
@@ -19,26 +22,72 @@ header { padding: 14px 16px 8px; }
 h1 { margin: 0; font-size: 15px; font-weight: 650; }
 header p { margin: 2px 0 0; color: var(--muted); }
 
-main { padding: 6px 16px 12px; display: grid; gap: 8px; }
+main { padding: 6px 16px 4px; display: grid; gap: 8px; }
+.empty { color: var(--muted); padding: 8px 0; }
 
-/* Each button is drawn like a text field, since that's what it fills */
+/* A form row: big fill button + small edit button, drawn like a text field */
+.row { display: flex; border: 1px solid var(--line); border-radius: 4px; }
+.row:hover { border-color: #aeb8c6; }
+.row:focus-within { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(59,111,224,.2); }
 .fill {
-  display: flex; align-items: baseline; justify-content: space-between;
-  width: 100%; padding: 9px 11px;
+  flex: 1; display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  padding: 9px 11px; min-width: 0;
   font: inherit; color: var(--ink); text-align: left;
-  background: var(--paper);
-  border: 1px solid var(--line); border-radius: 4px;
-  cursor: pointer;
+  background: none; border: 0; border-radius: 4px 0 0 4px; cursor: pointer;
 }
-.fill:hover { border-color: #aeb8c6; }
-.fill:focus-visible { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(59,111,224,.2); }
-.fill:active { background: #f5f7fa; }
-.fill .count { color: var(--muted); font-size: 12px; }
+.fill .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fill .count { color: var(--muted); font-size: 12px; flex: none; }
+.fill:active { background: var(--soft); }
 .fill[aria-busy="true"] { opacity: .6; cursor: progress; }
+.edit {
+  flex: none; padding: 0 11px; font: inherit; color: var(--muted);
+  background: none; border: 0; border-left: 1px solid var(--line);
+  border-radius: 0 4px 4px 0; cursor: pointer;
+}
+.edit:hover { color: var(--focus); background: var(--soft); }
+button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
-footer { padding: 0 16px 14px; min-height: 0; }
+.bar { padding: 4px 16px 12px; }
+.link {
+  padding: 4px 0; font: inherit; font-weight: 600; color: var(--focus);
+  background: none; border: 0; cursor: pointer;
+}
+.link:hover { text-decoration: underline; }
+
+footer { padding: 0 16px 14px; }
 footer:empty { display: none; }
 .msg { padding: 9px 11px; border-left: 3px solid var(--ok); background: #f1f8f4; }
 .msg.warn { border-color: var(--warn); background: #fdf6ee; }
 .msg strong { display: block; font-weight: 600; }
 .msg ul { margin: 4px 0 0; padding-left: 16px; color: var(--muted); }
+
+/* Edit view */
+.edit-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.saved { color: var(--muted); font-size: 12px; }
+.edit-body { padding: 12px 16px 16px; max-height: 520px; overflow-y: auto; }
+.lbl { display: block; font-weight: 600; margin-bottom: 4px; }
+.txt, .sel {
+  width: 100%; padding: 7px 9px; font: inherit; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 4px;
+}
+.txt:focus, .sel:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px rgba(59,111,224,.2); }
+
+.fields-head {
+  display: grid; grid-template-columns: 1fr 1fr 24px; gap: 6px;
+  margin: 16px 0 4px; color: var(--muted); font-size: 12px;
+}
+.field { display: grid; grid-template-columns: 1fr 1fr 24px; gap: 6px; margin-bottom: 12px; align-items: start; }
+.field .val { display: grid; gap: 4px; }
+.field .sel { padding: 4px 6px; font-size: 12px; color: var(--muted); }
+.remove {
+  width: 24px; height: 31px; padding: 0; font-size: 16px; line-height: 1; color: var(--muted);
+  background: none; border: 0; border-radius: 4px; cursor: pointer;
+}
+.remove:hover { color: var(--danger); background: #fdf1f0; }
+
+.hint { margin: 14px 0; color: var(--muted); font-size: 12px; }
+.danger {
+  padding: 7px 10px; font: inherit; color: var(--danger);
+  background: none; border: 1px solid #f0c4c0; border-radius: 4px; cursor: pointer;
+}
+.danger:hover { background: #fdf1f0; }
