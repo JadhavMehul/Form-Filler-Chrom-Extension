@@ -5,10 +5,25 @@
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-  <!-- List view: fill buttons -->
-  <section id="listView">
+  <!-- 1. Home: groups -->
+  <section id="homeView">
     <header>
       <h1>Form Filler</h1>
+      <p>Pick a group to see its forms.</p>
+    </header>
+    <main id="groups"></main>
+    <div class="bar">
+      <button id="addGroup" class="link" type="button">+ Add group</button>
+    </div>
+  </section>
+
+  <!-- 2. Group: fill buttons -->
+  <section id="listView" hidden>
+    <header class="nav">
+      <button id="toHome" class="link" type="button">‹ All groups</button>
+    </header>
+    <header>
+      <h1 id="groupTitle"></h1>
       <p>Open your form, then pick the data to fill.</p>
     </header>
     <main id="list"></main>
@@ -18,26 +33,43 @@
     <footer id="status" role="status" aria-live="polite"></footer>
   </section>
 
-  <!-- Edit view -->
+  <!-- 3. Edit a form -->
   <section id="editView" hidden>
     <header class="edit-head">
       <button id="back" class="link" type="button">‹ Done</button>
-      <span id="saved" class="saved" aria-live="polite"></span>
+      <span class="saved" aria-live="polite"></span>
     </header>
     <div class="edit-body">
       <label class="lbl" for="formName">Button name</label>
       <input id="formName" class="txt" type="text" />
 
+      <label class="lbl gap" for="formGroup">Group</label>
+      <select id="formGroup" class="txt"></select>
+
       <div class="fields-head">
-        <span>Label on the page</span>
+        <span>Label or button text</span>
         <span>Value</span>
       </div>
       <div id="fields"></div>
       <button id="addField" class="link" type="button">+ Add field</button>
 
-      <p class="hint">Changes save automatically. For dropdowns and radio buttons, type the option's text. For several checkboxes under one question, choose "Multiple" and separate options with commas.</p>
+      <p class="hint">Changes save automatically. For dropdowns and radio buttons, type the option's text. For several checkboxes under one question, choose "Multiple" and separate options with commas.<br><br>To press a button, add a row, type the button's text (e.g. Submit or Next) and choose "Click button". Rows run top to bottom; use the arrows to reorder.</p>
 
       <button id="deleteForm" class="danger" type="button">Delete this form</button>
+    </div>
+  </section>
+
+  <!-- 4. Edit a group -->
+  <section id="groupEditView" hidden>
+    <header class="edit-head">
+      <button id="groupBack" class="link" type="button">‹ Done</button>
+      <span class="saved" aria-live="polite"></span>
+    </header>
+    <div class="edit-body">
+      <label class="lbl" for="groupName">Group name</label>
+      <input id="groupName" class="txt" type="text" />
+      <p class="hint" id="groupInfo"></p>
+      <button id="deleteGroup" class="danger" type="button">Delete this group</button>
     </div>
   </section>
 

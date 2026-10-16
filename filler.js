@@ -1,8 +1,11 @@
 /*
  * This function runs INSIDE the web page (injected by popup.js).
  * It must stay self-contained: no references to anything outside it.
+ *
+ * steps: [{ kind: "field", label, value } | { kind: "click", label }]
+ * Steps run in order. Returns the indexes of steps that worked.
  */
-function fillFormByLabels(fields) {
+async function fillFormByLabels(steps) {
   const norm = (s) =>
     String(s == null ? "" : s)
       .replace(/[*:：]/g, " ")
@@ -139,21 +142,81 @@ function fillFormByLabels(fields) {
     return true;
   }
 
-  // ---- Collect controls -------------------------------------------
-  const textLike = Array.from(document.querySelectorAll(
-    'input:not([type=radio]):not([type=checkbox]):not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]):not([type=file]):not([type=image]), textarea, select, [contenteditable="true"]'
-  )).filter((el) => visible(el) && !el.disabled && !el.readOnly);
-  const choices = Array.from(document.querySelectorAll(
-    'input[type=radio], input[type=checkbox], [role=radio], [role=checkbox]'
-  )).filter((el) => visible(el) && !el.disabled);
+  // ---- Buttons ----------------------------------------------------
+  function buttonLabels(el) {
+    const out = [el.innerText, el.textContent, el.value, el.getAttribute("aria-label"), el.title];
+    const lb = el.getAttribute("aria-labelledby");
+    if (lb) lb.split(/\s+/).forEach((id) => {
+      const t = document.getElementById(id); if (t) out.push(textOf(t));
+    });
+    return out.map(norm).filter(Boolean);
+  }
 
+  function findButton(key) {
+    const els = Array.from(document.querySelectorAll(
+      'button, input[type=submit], input[type=button], input[type=reset], input[type=image], a, [role=button], [role=link], [role=tab], [role=menuitem]'
+    )).filter((el) => visible(el) && !el.disabled && el.getAttribute("aria-disabled") !== "true");
+    let best = null, bestS = 0;
+    for (const el of els) {
+      const labels = buttonLabels(el);
+      // Buttons: exact text wins strongly; avoid matching long paragraphs/links
+      let s = 0;
+      for (const l of labels) {
+        if (l === key) { s = 3; break; }
+        if (l.length <= key.length + 20 && (l.startsWith(key) || l.endsWith(key))) s = Math.max(s, 2);
+        else if (l.length <= key.length + 20 && l.includes(key)) s = Math.max(s, 1);
+      }
+      // Prefer real buttons over links on ties
+      if (s && el.tagName !== "A") s += 0.5;
+      if (s > bestS) { best = el; bestS = s; }
+    }
+    return best;
+  }
+
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // ---- Collect controls (re-run after each click, the page may change)
+  function collect() {
+    const textLike = Array.from(document.querySelectorAll(
+      'input:not([type=radio]):not([type=checkbox]):not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]):not([type=file]):not([type=image]), textarea, select, [contenteditable="true"]'
+    )).filter((el) => visible(el) && !el.disabled && !el.readOnly);
+    const choices = Array.from(document.querySelectorAll(
+      'input[type=radio], input[type=checkbox], [role=radio], [role=checkbox]'
+    )).filter((el) => visible(el) && !el.disabled);
+    return { textLike, choices };
+  }
+
+  let { textLike, choices } = collect();
   const used = new Set();
-  const filled = [];
-  const notFound = [];
+  const done = [];
 
-  for (const [rawKey, value] of Object.entries(fields)) {
-    const key = norm(rawKey);
-    let done = false;
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    const key = norm(step.label);
+    if (!key) continue;
+
+    // ---- Click a button ----
+    if (step.kind === "click") {
+      const btn = findButton(key);
+      if (!btn) continue;
+      done.push(i);
+      const isLast = steps.slice(i + 1).every((s) => !norm(s.label));
+      if (isLast) {
+        // Last step (often "Submit"): click after we've reported back,
+        // because the page may navigate away.
+        setTimeout(() => btn.click(), 150);
+      } else {
+        btn.scrollIntoView({ block: "center" });
+        btn.click();
+        await wait(1000);           // let the page update (e.g. "Next" page)
+        ({ textLike, choices } = collect());
+        used.clear();
+      }
+      continue;
+    }
+
+    const value = step.value;
+    let ok = false;
 
     // 1) Single checkbox with true/false
     if (typeof value === "boolean") {
@@ -170,12 +233,12 @@ function fillFormByLabels(fields) {
           const on = best.getAttribute("aria-checked") === "true";
           if (on !== value) best.click();
         } else setChecked(best, value);
-        used.add(best); done = true;
+        used.add(best); ok = true;
       }
     }
 
-    // 2) Radio group / checkbox group: question label → pick option(s)
-    if (!done && typeof value !== "boolean") {
+    // 2) Radio group / checkbox group: question label -> pick option(s)
+    if (!ok && typeof value !== "boolean") {
       const wanted = (Array.isArray(value) ? value : [value]).map(norm);
       const groupMatches = choices.filter((el) => score(groupLabels(el), key) >= 1);
       if (groupMatches.length) {
@@ -193,12 +256,12 @@ function fillFormByLabels(fields) {
             else setChecked(el, false);
           }
         }
-        if (hits) done = true;
+        if (hits) ok = true;
       }
     }
 
     // 3) Text inputs, textareas, dropdowns
-    if (!done && !Array.isArray(value) && typeof value !== "boolean") {
+    if (!ok && !Array.isArray(value) && typeof value !== "boolean") {
       let best = null, bestS = 0;
       for (const el of textLike) {
         if (used.has(el)) continue;
@@ -206,22 +269,23 @@ function fillFormByLabels(fields) {
         if (s > bestS) { best = el; bestS = s; }
       }
       if (best) {
-        if (best.tagName === "SELECT") done = fillSelect(best, value);
+        if (best.tagName === "SELECT") ok = fillSelect(best, value);
         else if (best.isContentEditable) {
           best.focus(); best.textContent = String(value);
           best.dispatchEvent(new Event("input", { bubbles: true }));
-          done = true;
-        } else { best.focus(); setNativeValue(best, String(value)); done = true; }
-        if (done) {
+          ok = true;
+        } else { best.focus(); setNativeValue(best, String(value)); ok = true; }
+        if (ok) {
           used.add(best);
-          best.style.outline = "2px solid #3b6fe0";
-          setTimeout(() => (best.style.outline = ""), 1500);
+          const el = best;
+          el.style.outline = "2px solid #3b6fe0";
+          setTimeout(() => (el.style.outline = ""), 1500);
         }
       }
     }
 
-    (done ? filled : notFound).push(rawKey);
+    if (ok) done.push(i);
   }
 
-  return { filled, notFound, frame: location.href };
+  return { done, frame: location.href };
 }

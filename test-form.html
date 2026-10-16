@@ -3,7 +3,7 @@
 <style>body{font:14px system-ui;max-width:480px;margin:40px auto}div{margin:10px 0}label{display:block}</style></head>
 <body>
 <h2>Test form (use "Form 1 data")</h2>
-<form>
+<form onsubmit="event.preventDefault();document.getElementById('done').textContent='Submitted!'">
   <div><label for="n">Full Name *</label><input id="n"></div>
   <div><label>Email: <input type="email"></label></div>
   <div><span>Phone</span><input type="tel"></div>
@@ -16,5 +16,11 @@
   <div><label for="c">Country</label><select id="c"><option value="">Select</option><option value="in">India</option><option value="us">USA</option></select></div>
   <div><label for="a">Address</label><textarea id="a"></textarea></div>
   <div><label><input type="checkbox"> I agree to the terms</label></div>
+  <button type="button" onclick="document.getElementById('p2').hidden=false">Next</button>
+  <div id="p2" hidden>
+    <div><label for="r">Referral code</label><input id="r"></div>
+    <button type="submit">Submit</button>
+  </div>
+  <p id="done"></p>
 </form>
 </body></html>
