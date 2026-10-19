@@ -108,3 +108,26 @@ footer:empty { display: none; }
 .lbl.gap { margin-top: 12px; }
 select.txt { padding: 6px 7px; }
 .open .name::after { content: " ›"; color: var(--muted); }
+
+/* Import / export icons */
+.title-row { display: flex; align-items: center; justify-content: space-between; }
+.nav { display: flex; align-items: center; justify-content: space-between; }
+.right { display: flex; align-items: center; gap: 8px; }
+.io { display: inline-flex; gap: 2px; }
+.icon {
+  width: 28px; height: 28px; padding: 6px; display: grid; place-items: center;
+  color: var(--muted); background: none; border: 0; border-radius: 4px; cursor: pointer;
+}
+.icon:hover { color: var(--focus); background: var(--soft); }
+.icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.note-slot { padding: 0 16px; }
+.note-slot:empty { display: none; }
+.note-slot .msg { margin: 6px 0 8px; }
+.choices { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.choices button {
+  padding: 5px 9px; font: inherit; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 4px; cursor: pointer;
+}
+.choices button.primary { color: #fff; background: var(--focus); border-color: var(--focus); }
+.choices button.danger-btn { color: var(--danger); border-color: #f0c4c0; }

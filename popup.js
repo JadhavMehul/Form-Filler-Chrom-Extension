@@ -17,6 +17,7 @@ let editingGroup = -1;
 
 function showView(v) {
   views.forEach((el) => (el.hidden = el !== v));
+  document.querySelectorAll(".note-slot").forEach((n) => (n.innerHTML = ""));
   window.scrollTo(0, 0);
 }
 

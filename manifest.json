@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Form Filler",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Fill web forms with your saved data, matched by field label.",
   "permissions": [
     "activeTab",
